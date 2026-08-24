@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
   <title>토니 바오밥의 프로필 & 여행 기록</title>
   <style>
     * {
@@ -203,6 +205,13 @@
       display: none;
     }
 
+    /* 섹션 구분선 */
+    .section-divider {
+      height: 1px;
+      background-color: #f0ece1;
+      margin: 36px 0 28px 0;
+    }
+
     /* 카드 그리드 */
     .card-grid {
       display: grid;
@@ -267,26 +276,7 @@
       overflow: hidden;
     }
 
-    /* 추천 유튜브 영역 추가 스타일 */
-    .youtube-section {
-      margin-top: 40px;
-      border-top: 1px solid #f0ece1;
-      padding-top: 28px;
-    }
-
-    .youtube-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .youtube-header h2 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #111;
-    }
-
+    /* 유튜브 카드 스타일 */
     .youtube-card {
       background: #fcfbf7;
       border-radius: 16px;
@@ -296,34 +286,84 @@
       text-decoration: none;
       color: inherit;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
     }
 
     .youtube-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
     }
 
-    .youtube-btn {
-      display: inline-block;
-      margin-top: 8px;
-      font-size: 12px;
+    .youtube-thumb-wrapper {
+      position: relative;
+      width: 100%;
+      height: 140px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      background-color: #eee;
+    }
+
+    .youtube-thumb-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .youtube-card:hover .youtube-thumb-wrapper img {
+      transform: scale(1.04);
+    }
+
+    .youtube-play-icon {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 30px;
+      height: 22px;
+      background: rgba(255, 0, 0, 0.9);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .youtube-play-icon svg {
+      width: 12px;
+      height: 12px;
+      fill: #ffffff;
+      margin-left: 2px;
+    }
+
+    .youtube-category-badge {
+      background-color: #fff4e0;
+      color: #b78037;
+      font-size: 11px;
       font-weight: 600;
-      color: #c48332;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      width: fit-content;
+      margin-bottom: 8px;
     }
 
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
       }
+
       .profile-card {
         width: 100%;
       }
+
       .card-grid {
         grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
+
 <body>
 
   <div class="container">
@@ -332,14 +372,14 @@
       <div class="profile-avatar">
         <img id="profile-img" 
              src="profile.jpg" 
-             onerror="handleImageError(this)"
+             onerror="handleProfileImgError(this)"
              alt="프로필 이미지">
       </div>
       <div id="profile-name" class="profile-name">토니 바오밥</div>
       <div id="profile-badge" class="profile-badge">시간을 걸으면서 나를 찾는 나</div>
       <div id="profile-bio" class="profile-bio">
-        저는 30년 이상 공직생활을 하고 2024년부로 퇴직 후, 재직 중 하지 못했던 세계 오지를 여행하면서 느낀 솔직한 감정을 블로그에 올려 독자들과 소통하며 이 자료들을 정리하여 책을 출판하는 작가로 활동 중입니다.<br><br>
-        그리고 관광통역안내사 자격증을 활용하여 한국을 방문하는 외국인에게 우리나라를 홍보하는 민간 외교관 역할을 수행 중입니다.
+        저는 30년 이상 공직생활을 하고 정년퇴직 후, 재직 중 하지 못했던 세계 오지를 여행하면서 느낀 솔직한 감정을 블로그에 올려 독자들과 소통중.<br><br>
+        관광통역안내사 자격증을 활용, 한국을 홍보하는 민간 외교관 역할을 수행 중입니다.
       </div>
     </div>
 
@@ -357,20 +397,22 @@
       <div class="sync-box">
         <div class="sync-header">
           <span class="sync-title">구글 스프레드시트 URL 입력</span>
-          <span class="sync-notice">* 'profile', 'travel' 시트 탭 공개 설정 필요</span>
+          <span class="sync-notice">* 'profile', 'travel', '추천 유튜브' 시트 탭 공개 설정 필요</span>
         </div>
         <div class="input-group">
           <input type="text" id="sheet-url-input" placeholder="구글 스프레드시트 전체 URL 주소를 입력하세요">
           <button class="btn-sync" onclick="handleConnect()">연동하기</button>
         </div>
-        <div id="sync-status" class="sync-status">✓ 성공적으로 연동되었습니다! (profile, travel 시트)</div>
+        <div id="sync-status" class="sync-status">✓ 성공적으로 연동되었습니다! (profile, travel, 추천 유튜브 시트)</div>
       </div>
 
-      <!-- 카드 리스트 영역 -->
+      <!-- 여행 카드 리스트 영역 -->
       <div id="card-grid" class="card-grid">
         <div class="travel-card">
           <div class="card-img-wrapper">
-            <img src="https://lh3.googleusercontent.com/d/1SG5gf6JUBcNsk3TIEtzevIBL81-vZOpC" alt="바이칼호 알혼섬">
+            <img src="images/20260622_172232.jpg" 
+                 alt="바이칼호 알혼섬" 
+                 onerror="handleCardImgError(this, 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80')">
           </div>
           <div class="card-info">
             <span class="card-date">2026.06.22</span>
@@ -382,7 +424,9 @@
 
         <div class="travel-card">
           <div class="card-img-wrapper">
-            <img src="https://lh3.googleusercontent.com/d/1Ka3Xa-r7b5nUSUPa7jHt4BHcnggOuS-7" alt="바이칼 호숫가">
+            <img src="images/20260623_110155.jpg" 
+                 alt="바이칼 호숫가" 
+                 onerror="handleCardImgError(this, 'https://images.unsplash.com/photo-1439853941329-a99ce0435c00?w=600&auto=format&fit=crop&q=80')">
           </div>
           <div class="card-info">
             <span class="card-date">2026.06.23</span>
@@ -394,7 +438,9 @@
 
         <div class="travel-card">
           <div class="card-img-wrapper">
-            <img src="https://lh3.googleusercontent.com/d/1Z_mcwO4h8nuyOmhO-lalTX0QCbDvKsb-" alt="바이칼 해변">
+            <img src="images/20260623_110320.jpg" 
+                 alt="바이칼 해변" 
+                 onerror="handleCardImgError(this, 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80')">
           </div>
           <div class="card-info">
             <span class="card-date">2026.06.23</span>
@@ -406,7 +452,9 @@
 
         <div class="travel-card">
           <div class="card-img-wrapper">
-            <img src="https://lh3.googleusercontent.com/d/1VkxKCYcQLzm5j9N3hu4KbODXK5B1X8JN" alt="백두산 천문봉">
+            <img src="images/20260630_113339.jpg" 
+                 alt="백두산 천문봉" 
+                 onerror="handleCardImgError(this, 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&auto=format&fit=crop&q=80')">
           </div>
           <div class="card-info">
             <span class="card-date">2026.06.30</span>
@@ -417,42 +465,41 @@
         </div>
       </div>
 
-      <!-- 추천하는 유튜브 채널 영역 -->
-      <div class="youtube-section">
-        <div class="youtube-header">
-          <h2>추천하는 유튜브 채널</h2>
+      <!-- 추천하는 유튜브 채널 섹션 -->
+      <div class="section-divider"></div>
+
+      <div class="header-area">
+        <div class="title-group">
+          <h1>추천하는 유튜브 채널</h1>
           <span class="badge-sub">Recommended YouTube</span>
         </div>
+      </div>
 
-        <div class="card-grid">
-          <!-- 유튜브 카드 1 -->
-          <a href="https://www.youtube.com/@EBSDocumentary" target="_blank" rel="noopener noreferrer" class="youtube-card">
-            <div class="card-img-wrapper">
-              <img src="https://img.youtube.com/vi/3N3-p3J957g/hqdefault.jpg" alt="EBS 다큐">
+      <!-- 유튜브 카드 리스트 영역 -->
+      <div id="youtube-grid" class="card-grid">
+        <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="youtube-card">
+          <div class="youtube-thumb-wrapper">
+            <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=600&auto=format&fit=crop&q=80" alt="세계 오지 여행 브이로그">
+            <div class="youtube-play-icon">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
-            <div class="card-info">
-              <span class="card-date">세계 여행 / 다큐</span>
-              <span class="card-tag">추천 채널</span>
-            </div>
-            <div class="card-title">EBS 다큐멘터리 (세계테마기행)</div>
-            <div class="card-desc">세계 곳곳의 숨겨진 비경과 깊이 있는 문화를 간직한 대자연을 영상으로 생생하게 볼 수 있어 자주 참고하는 채널입니다.</div>
-            <span class="youtube-btn">▶ 채널 바로가기</span>
-          </a>
+          </div>
+          <span class="youtube-category-badge">여행 & 탐험</span>
+          <div class="card-title">세계 오지 여행 브이로그</div>
+          <div class="card-desc">숨겨진 대자연의 비경과 전 세계 현지인들의 삶을 담은 감성 여행 영상입니다.</div>
+        </a>
 
-          <!-- 유튜브 카드 2 -->
-          <a href="https://www.youtube.com/@PaniBottle" target="_blank" rel="noopener noreferrer" class="youtube-card">
-            <div class="card-img-wrapper">
-              <img src="https://img.youtube.com/vi/B97C2B2-eEE/hqdefault.jpg" alt="빠니보틀">
+        <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="youtube-card">
+          <div class="youtube-thumb-wrapper">
+            <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80" alt="한국 문화 및 관광 가이드">
+            <div class="youtube-play-icon">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
-            <div class="card-info">
-              <span class="card-date">오지 여행 / 로드트립</span>
-              <span class="card-tag">추천 채널</span>
-            </div>
-            <div class="card-title">빠니보틀 Pani Bottle</div>
-            <div class="card-desc">날것 그대로의 오지 여행기와 다양한 문화권 사람들과 솔직하게 소통하는 유쾌한 여행 팁을 배울 수 있는 채널입니다.</div>
-            <span class="youtube-btn">▶ 채널 바로가기</span>
-          </a>
-        </div>
+          </div>
+          <span class="youtube-category-badge">문화 & 해설</span>
+          <div class="card-title">한국 문화 및 관광 가이드</div>
+          <div class="card-desc">관광통역안내사가 직접 들려주는 한국의 아름다운 유적지와 명소 이야기.</div>
+        </a>
       </div>
 
     </div>
@@ -460,103 +507,90 @@
 
   <!-- 구글 시트 연동 자바스크립트 -->
   <script>
-   const SPREADSHEET_ID = '1xVyY5Ch29mxngC81n4df3QmLB8c4MXHZCS1Yu6JT5K0';
-const TAB_NAME = encodeURIComponent('추천 유튜브');
+    const DEFAULT_TRAVEL_FALLBACK = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80';
+    const DEFAULT_PROFILE_FALLBACK = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80';
 
-// headers=0 옵션을 추가하여 1행(제목/카테고리...)부터 데이터로 안정적으로 가져오도록 설정
-const fetchUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${TAB_NAME}&headers=0`;
-
-async function loadYouTubeSection() {
-  const container = document.getElementById('youtube-card-container');
-  if (!container) return; // 요소가 없으면 실행 중단 (기존 영역 보호)
-
-  try {
-    const response = await fetch(fetchUrl);
-    const textData = await response.text();
-    
-    // gviz JSON 안전하게 파싱
-    const jsonString = textData.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
-    if (!jsonString || !jsonString[1]) {
-      throw new Error("구글 시트 응답 형식이 올바르지 않습니다.");
+    function extractDriveFileId(url) {
+      if (!url) return null;
+      const str = String(url).trim();
+      let match = str.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) return match[1];
+      match = str.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) return match[1];
+      match = str.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) return match[1];
+      if (/^[a-zA-Z0-9_-]{25,50}$/.test(str)) return str;
+      return null;
     }
 
-    const data = JSON.parse(jsonString[1]);
-    const rows = data.table.rows;
-
-    if (!rows || rows.length === 0) {
-      console.warn("추천 유튜브 시트에 데이터가 없습니다.");
-      return;
+    function getDriveImageUrl(url, step = 0) {
+      if (!url) return '';
+      const str = String(url).trim();
+      const fileId = extractDriveFileId(str);
+      if (fileId) {
+        if (step === 0) return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+        if (step === 1) return `https://lh3.googleusercontent.com/d/${fileId}`;
+        if (step === 2) return `https://drive.google.com/uc?export=view&id=${fileId}`;
+      }
+      return str;
     }
 
-    container.innerHTML = ''; // 초기화
-
-    rows.forEach((row, index) => {
-      // row.c가 없거나 비어있는 경우 예외 처리
-      if (!row.c) return;
-
-      // 셀 값 추출 (문자열 또는 객체의 v 값)
-      const getValue = (cell) => {
-        if (!cell) return '';
-        return cell.v !== undefined && cell.v !== null ? String(cell.v).trim() : '';
-      };
-
-      const title = getValue(row.c[0]);
-      const category = getValue(row.c[1]);
-      const description = getValue(row.c[2]);
-      const youtubeUrl = getValue(row.c[3]);
-      const customThumbnail = getValue(row.c[4]);
-
-      // 헤더 행(1행) 자동 제외 로직
-      if (index === 0 && (title === '제목' || category === '카테고리' || youtubeUrl === '유튜브링크')) {
+    function handleCardImgError(img, defaultFallback) {
+      const fallback = defaultFallback || DEFAULT_TRAVEL_FALLBACK;
+      const fileId = img.dataset.fileId || extractDriveFileId(img.src);
+      let step = parseInt(img.dataset.retryStep || "0", 10);
+      if (fileId && step < 2) {
+        step++;
+        img.dataset.fileId = fileId;
+        img.dataset.retryStep = String(step);
+        img.src = getDriveImageUrl(fileId, step);
         return;
       }
+      img.onerror = null;
+      img.src = fallback;
+    }
 
-      // 제목과 링크가 모두 없는 빈 행은 스킵
-      if (!title && !youtubeUrl) return;
+    function handleProfileImgError(img) {
+      const fileId = img.dataset.fileId || extractDriveFileId(img.src);
+      let step = parseInt(img.dataset.retryStep || "0", 10);
+      if (fileId && step < 2) {
+        step++;
+        img.dataset.fileId = fileId;
+        img.dataset.retryStep = String(step);
+        img.src = getDriveImageUrl(fileId, step);
+        return;
+      }
+      if (step === 2) {
+        img.dataset.retryStep = "3";
+        img.src = "profile.jpg";
+      } else if (step === 3) {
+        img.dataset.retryStep = "4";
+        img.src = "images/profile.jpg";
+      } else {
+        img.onerror = null;
+        img.src = DEFAULT_PROFILE_FALLBACK;
+      }
+    }
 
-      // 썸네일 결정: 사용자 지정 썸네일 > 유튜브 자동 썸네일 > 기본 이미지
-      const autoThumbnail = getYouTubeThumbnail(youtubeUrl);
-      const finalThumbnail = customThumbnail || autoThumbnail || 'https://via.placeholder.com/480x270?text=No+Image';
+    function extractSheetId(url) {
+      if (!url) return null;
+      const match = String(url).match(/\/d\/([a-zA-Z0-9_-]+)/);
+      return match ? match[1] : null;
+    }
 
-      const cardHtml = `
-        <div class="youtube-card">
-          <a href="${youtubeUrl || '#'}" target="_blank" rel="noopener noreferrer">
-            <div class="thumbnail-box">
-              <img src="${finalThumbnail}" alt="${title}" loading="lazy" />
-            </div>
-            <div class="card-info">
-              <span class="category-badge">${category}</span>
-              <h3 class="card-title">${title}</h3>
-              <p class="card-desc">${description}</p>
-            </div>
-          </a>
-        </div>
-      `;
-      container.insertAdjacentHTML('beforeend', cardHtml);
-    });
-  } catch (error) {
-    console.error("'추천 유튜브' 데이터를 가져오는 중 오류가 발생했습니다:", error);
-  }
-}
-
-// 유튜브 썸네일 추출 함수
-function getYouTubeThumbnail(url) {
-  if (!url) return null;
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length === 11) 
-    ? `https://img.youtube.com/vi/${match[2]}/hqdefault.jpg` 
-    : null;
-}
-
-// DOM이 준비되었을 때 실행
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadYouTubeSection);
-} else {
-  loadYouTubeSection();
-}
-    
-     
+    function handleConnect() {
+      const urlInput = document.getElementById('sheet-url-input').value.trim();
+      if (!urlInput) {
+        alert('구글 스프레드시트 URL을 입력해 주세요.');
+        return;
+      }
+      const sheetId = extractSheetId(urlInput);
+      if (!sheetId) {
+        alert('유효한 구글 스프레드시트 URL이 아닙니다.');
+        return;
+      }
+      localStorage.setItem('user_sheet_url', urlInput);
+    }
   </script>
 </body>
 </html>
